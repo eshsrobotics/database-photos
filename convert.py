@@ -18,29 +18,33 @@ def searchFiles(directory='.', extension=''):
         print(os.path.join(dirpath, name))
 
 
-print("Converting .png images to .jpg")
-searchFiles(".", ".png")
+print('Converting .png images to .jpg')
+searchFiles('.', '.png')
 for image in foundImages:
   im = Image.open(image)
-  rgp_im = im.convert("RGB")
+  rgp_im = im.convert('RGB')
   newName = os.path.splitext(image)[0] + '.jpg'
   rgp_im.save(newName)
+  print(image + ' => ' + 'newName')
   # Image.close()
 
 
-print("Creating smaller versions of .png images")
-searchFiles(".", ".jpg")
-  im = Image.open(image)
+print('Creating smaller versions of .png images (copying)')
+searchFiles('.', '.jpg')
+for image in foundImages:
+  if image.split('.')[-2] != 'small':
+    im = Image.open(image)
 
-  # Old Numbers
-  x = im.size[0]
-  y = im.size[1]
-  ratio = y / float(x)
+    # Old Numbers
+    x = im.size[0]
+    y = im.size[1]
+    ratio = y / float(x)
 
-  # New Numbers
-  widthXSmall = 500
-  widthYSmall = widthXSmall * ratio
+    # New Numbers
+    widthXSmall = 500
+    widthYSmall = widthXSmall * ratio
 
-  im = im.resize((int(widthXSmall),int(widthYSmall)),Image.ANTIALIAS)
-  newName = os.path.splitext(image)[0] + '.small.jpg'
-  im.save(newName,optimize=True,quality=85)
+    im = im.resize((int(widthXSmall),int(widthYSmall)),Image.ANTIALIAS)
+    newName = os.path.splitext(image)[0] + '.small.jpg'
+    im.save(newName,optimize=True,quality=85)
+    print(image + ' => ' + newName)

@@ -1,60 +1,44 @@
-# setup
-totalPNG=0
-totalJPG=0
-totalJPEG=0
-totalFiles=0
+#!/bin/bash
 
-IFS=$'\n'; set -f
+# ------------------------------------------------------------------------------
+# This simple script recursively creates sibling thumbnails for every JPG and
+# PNG file in the current directory.  If the file's name is foo.png, the
+# thumbnail's name will be foo.small.png.
+#
+# You'll have to git add the generated thumbnails yourself.
+# ------------------------------------------------------------------------------
 
-echo "This script converts .png files to .jpg files, if any are found. Additionally, this script converts high resolution jpeg images to lower resolution ones, with two varying sizes. So, there are three sizes for every jpeg."
-echo
-# png
-for f in $(find . -name '*.png' -or -name '*.PNG');
+THUMBNAIL_WIDTH=500
+
+converted=0
+notConverted=0
+while read image
 do
-  totalPNG=$((totalPNG+1))
+    suffix="$(echo "${image##*.}" | tr 'A-Z' 'a-z')"
+    if [[ "$image" =~ \.small\.${suffix}$ ]]; then
+        echo -ne
+        # echo "$image is already a thumbnail."
+    else
+        # For those curious about the ${image##*.} and ${image%.*} syntax, man
+        # bash, then use "/" to search for "parameter expansion".
+        imageNameWithoutSuffix="${image%.*}"
+        imageNameWithoutSuffix="$(basename "$imageNameWithoutSuffix")"
+        dir="$(dirname "$image")"
+        thumbnailName="${imageNameWithoutSuffix}.small.${suffix}"
+        destination="$dir"/"$thumbnailName"
 
-  echo "Found: "$totalPNG": "$f"";
-  lengthMinuxFileEnding="$(("${#f}" - 3))"
-  # https://unix.stackexchange.com/a/303967
-  fNew="${f%????}"
-  echo "${fNew}.png"
-  echo "${fNew}.jpg"
-  convert "${fNew}.png" "${fNew}.jpg"
-done
+        if [[ (! -e "$destination") || "$image" -nt "$destination" ]]; then
+            # ImageMagick's default quality is 92 (out of 100.)
+            # ImageMagick's default PNG compression is already 75 (out of 100.)
+            echo Calling: convert -geometry $THUMBNAIL_WIDTH -quality 75 "$image" "$destination"
+            convert -geometry $THUMBNAIL_WIDTH -quality 75 "$image" "$destination"
+            converted="$((converted + 1))"
+        else
+            echo "$image already has a recent thumbnail ($destination)."
+            notConverted="$((notConverted + 1))"
+        fi
+    fi
+done < <(find . -iname "*.png" -or -iname "*jpg" -or -iname "*.jpeg" -or -iname "*.gif")
 
-# # jpg
-# for f in $(find . -name '*.jpg' -or -name '*.JPG');
-# do
-#   totalJPG=$((totalJPG+1))
-
-#   echo "jpg: "${totalJPG}" "${f}"";
-#   lengthMinuxFileEnding="$(("${#f}" - 3))"
-#   # https://unix.stackexchange.com/a/303967
-#   fNew="${f%????}"
-
-  
-# done
-
-# jpeg
-for f in $(find . -name '*.jpeg' -or -name '*.JPEG');
-do
-  totalJPG=$((totalJPEG+1))
-
-  echo "jpeg: "${totalJPEG}" "${f}"";
-
-done
-
-# find all items in all subdirs
-for f in $(find .);
-do
-  totalFiles=$((totalAll+1))
-done
-
-# output
-echo
-echo "Total PNG: "$totalPNG""
-echo "Total JPG: "$totalJPG""
-echo "Total JPEG: "$totalJPEG""
-echo "Total All (including non-originals): "$totalFiles""
-
-unset IFS; set +f
+echo "Generated $converted new thumbnails and skipped $notConverted up-to-date thumbnails."
+exit 0

@@ -27,6 +27,13 @@ do
         thumbnailName="${imageNameWithoutSuffix}.small.${suffix}"
         destination="$dir"/"$thumbnailName"
 
+        if [[ "$image" =~ /photo-dump/ ]]; then
+            # Don't generate thumbnails for the photo-dump; those are supposed
+            # to be refiled and our websites aren't going to link to it
+            # anyway.
+            continue
+        fi
+
         if [[ (! -e "$destination") || "$image" -nt "$destination" ]]; then
             # ImageMagick's default quality is 92 (out of 100.)
             # ImageMagick's default PNG compression is already 75 (out of 100.)

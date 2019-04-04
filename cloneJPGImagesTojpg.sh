@@ -36,19 +36,18 @@ do
         fi
 
         if [[ (! -e "$destination") || "$image" -nt "$destination" ]]; then
-            echo "foxtrot "$image
-            echo "ddddddd "$nonModifiedSuffix
-
             # Convert the foo.JPG / foo.PNG to a foo.jpg / foo.png respectively
             echo cp $image $image"z"
             echo rm $image
             echo cp $image"z" $destination
 
+            cp $image $image"z"
+            rm $image
+            cp $image"z" $destination
+
             converted="$((converted + 1))"
         else
-            echo "foxtrot "${image}
-            echo "hoteldd "$nonModifiedSuffix
-            # echo "$image already has a recent thumbnail ($destination)."
+            echo "$image already is lowercase."
             notConverted="$((notConverted + 1))"
         fi
     fi

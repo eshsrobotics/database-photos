@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # ------------------------------------------------------------------------------
+# THIS SCRIPT DOES NOT WORK DO NOT RUN
 # This simple script recursively creates sibling thumbnails for every file with
 # a JPG extension and PNG file in the current directory.  If the file's name
 # is foo.PNG, the duplicate file's name will be foo.png.
@@ -28,6 +29,9 @@ do
         thumbnailName="${imageNameWithoutSuffix}.${suffix}"
         destination="$dir"/"$thumbnailName"
 
+        rm "$image'z'"
+        rm "${image}z"
+
         if [[ "$image" =~ /photo-dump/ ]]; then
             # Don't generate thumbnails for the photo-dump; those are supposed
             # to be refiled and our websites aren't going to link to it
@@ -37,17 +41,24 @@ do
 
         if [[ (! -e "$destination") || "$image" -nt "$destination" ]]; then
             # Convert the foo.JPG / foo.PNG to a foo.jpg / foo.png respectively
-            echo cp $image $image"z"
-            echo rm $image
-            echo cp $image"z" $destination
+            # echo cp "$image" "${$image"z"}"
+            # echo rm "$image"
+            # echo cp ${$image"z"} "$destination"
 
-            cp $image $image"z"
-            rm $image
-            cp $image"z" $destination
+            # cp "$image" ${$image"z"}
+            # rm "$image"
+            # cp ${$image"z"} "$destination"
 
             converted="$((converted + 1))"
         else
             echo "$image already is lowercase."
+            # echo cp "$image" "$image'z'"
+            # # echo rm "$image"
+            # echo cp "$image'z'" "$destination"
+
+            # cp "$image" "$image'z'"
+            # rm "$image"
+            # cp "$image'z'" "$destination"
             notConverted="$((notConverted + 1))"
         fi
     fi
